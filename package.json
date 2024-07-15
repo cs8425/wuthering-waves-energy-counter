@@ -1,0 +1,17 @@
+{
+  "name": "wuthering-waves-energy-counter",
+  "version": "1.0.0",
+  "description": "A simple project for energy counter of the game Wuthering Waves",
+  "dependencies": {
+    "bulma": "^1.0.1",
+    "preact": "^10.22.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.23.0",
+    "serve-handler": "^6.1.5"
+  },
+  "scripts": {
+    "build": "node esbuild.js",
+    "start": "node esbuild-dev.mjs"
+  }
+}
