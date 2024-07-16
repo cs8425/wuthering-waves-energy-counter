@@ -34,7 +34,7 @@ function EnergyStats(props) {
 	} = props;
 	const accName = val[0];
 	const now = Date.now();
-	const dt = (now < val[1] + MaxEnergyConstTime) ? now - val[1] : 0;
+	const dt = (now < val[1] + MaxEnergyConstTime) ? now - val[1] : MaxEnergyConstTime;
 	const energy = Math.floor(dt / EnergyConstTime);
 	const nextMs = EnergyConstTime - (dt % EnergyConstTime);
 	const nextTime = val[1] + (energy + 1) * EnergyConstTime;
@@ -246,9 +246,10 @@ function App() {
 					show={showSetup}
 					closeFn={() => { setShowSetup(false) }}
 					saveFn={(val, mm, ss) => {
+						console.log('[set]', val, mm, ss);
 						const now = Date.now();
 						const acc = confRef.current[0];
-						acc[1] = now - val * EnergyConstTime - mm * 60 * 1000 - ss * 1000;
+						acc[1] = now - ((val + 1) * EnergyConstTime) + (mm * 60 * 1000) + (ss * 1000);
 
 						// write back
 						window.localStorage.setItem('ts', JSON.stringify(confRef.current));
