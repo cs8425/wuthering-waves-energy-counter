@@ -10,6 +10,10 @@ import './all.min.css';
 // 1721060676775 => 3
 // 1721059596775 => 0
 
+const DefaultData = [
+	['Rover', 1721059596775],
+];
+
 const EnergyConstTime = 6 * 60 * 1000;
 const MaxEnergyConstTime = EnergyConstTime * 240;
 
@@ -198,28 +202,31 @@ function UseEnergyModal(props) {
 	);
 }
 
+function loadData() {
+	let accStr = window.localStorage.getItem('ts');
+	if (!accStr) {
+		return DefaultData;
+	}
+	try {
+		let accs = JSON.parse(accStr);
+		return accs;
+	}
+	catch (e) {
+		// TODO:
+	}
+	return DefaultData;
+}
+
 function App() {
-	const confRef = useRef([
-		['Rover', 1721059596775],
-	]);
+	const confRef = useRef(loadData());
 	const doUpdate = useForceUpdate();
 	const renderRef = useRef(null);
 
 	const [showSetup, setShowSetup] = useState(false);
 	const [showUseEnergy, setShowUseEnergy] = useState(false);
+	const [showImportExport, setShowImportExport] = useState(false);
 
 	useEffect(() => {
-		let accStr = window.localStorage.getItem('ts');
-		if (accStr) {
-			try {
-				let accs = JSON.parse(accStr);
-				confRef.current = accs;
-			}
-			catch (e) {
-				// TODO:
-			}
-		}
-
 		const render = () => {
 			doUpdate();
 			renderRef.current = window.requestAnimationFrame(render);
@@ -233,8 +240,21 @@ function App() {
 	return (
 		<section class="section">
 			<div class="container">
-				<h1 class="title">Wuthering Waves</h1>
-				<p class="subtitle">energy counter</p>
+				<nav class="level">
+					<div class="level-left">
+						<div class="level-item">
+							<div class="container">
+								<h1 class="title">Wuthering Waves</h1>
+								<p class="subtitle">energy counter</p>
+							</div>
+						</div>
+					</div>
+					<div class="level-right">
+						<p class="level-item">
+							<a class="button is-warning" onClick={() => { setShowImportExport(true) }}>Load/Export</a>
+						</p>
+					</div>
+				</nav>
 				<hr />
 				<EnergyStats
 					val={confRef.current[0]}
@@ -267,9 +287,69 @@ function App() {
 						window.localStorage.setItem('ts', JSON.stringify(confRef.current));
 					}}
 				/>
+
+				<ImportExportModal
+					show={showImportExport}
+					data={confRef.current}
+					closeFn={() => { setShowImportExport(false) }}
+					saveFn={(val) => {
+						confRef.current = val;
+
+						// write back
+						window.localStorage.setItem('ts', JSON.stringify(confRef.current));
+					}}
+				/>
 			</div>
 		</section>
 	);
 }
 
 render(h(App), document.getElementById('app'));
+
+function ImportExportModal(props) {
+	const {
+		show = false,
+		data = DefaultData,
+		saveFn = nopFn,
+		closeFn = nopFn,
+	} = props;
+	const [textVal, setTextVal] = useState(JSON.stringify(data));
+	const importHdr = (e) => {
+		console.log('[load]0', e, textVal);
+		try {
+			const val = JSON.parse(textVal);
+			console.log('[load]', val);
+			saveFn(val);
+		}
+		catch (e) {
+			// TODO:
+			setTextVal(JSON.stringify(data));
+		}
+		closeFn();
+	}
+	return (
+		<div class={`modal ${(show) ? 'is-active' : ''}`}>
+			<div class="modal-background"></div>
+			<div class="modal-card">
+				<header class="modal-card-head">
+					<p class="modal-card-title">Load/Export</p>
+					<button class="delete" aria-label="close" onClick={closeFn}></button>
+				</header>
+				<section class="modal-card-body">
+					<textarea
+						class="textarea"
+						placeholder="data"
+						value={textVal}
+						onInput={(e) => { setTextVal(e.target.value) }}
+					></textarea>
+				</section>
+				<footer class="modal-card-foot">
+					<div class="buttons">
+						<button class="button is-primary" onClick={importHdr}>Load</button>
+						<button class="button" onClick={closeFn}>Cancel</button>
+					</div>
+				</footer>
+			</div>
+		</div>
+	);
+}
