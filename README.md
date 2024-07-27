@@ -2,6 +2,10 @@
 
 A simple project for energy counter of the game Wuthering Waves.
 
+## online website
+
+host by github pages + cloudflare: [https://wuthering.sauceburnseal.net/](https://wuthering.sauceburnseal.net/)
+
 
 ## build
 
@@ -19,8 +23,11 @@ build:
 ## dev
 
 run: `npm run start`
+
 local server will at http://127.0.0.1:8008/
+
 can be config in `esbuild-dev.mjs`
+
 
 ## TODO
 
