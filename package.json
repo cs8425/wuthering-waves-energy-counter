@@ -12,6 +12,7 @@
   },
   "scripts": {
     "build": "node esbuild.js",
-    "start": "node esbuild-dev.mjs"
+    "start": "node esbuild-dev.mjs",
+    "release": "node esbuild.js && bash release.sh"
   }
 }
