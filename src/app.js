@@ -280,8 +280,14 @@ function App() {
 					show={showUseEnergy}
 					closeFn={() => { setShowUseEnergy(false) }}
 					saveFn={(val) => {
+						const now = Date.now();
 						const acc = confRef.current[0];
-						acc[1] = acc[1] + val * EnergyConstTime;
+						if (now > acc[1] + MaxEnergyConstTime) {
+							// over 240
+							acc[1] = now - MaxEnergyConstTime + val * EnergyConstTime;
+						} else {
+							acc[1] = acc[1] + val * EnergyConstTime;
+						}
 
 						// write back
 						window.localStorage.setItem('ts', JSON.stringify(confRef.current));
